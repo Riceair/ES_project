@@ -9,7 +9,7 @@ class GenAudio(object):
     def __init__(self):
         self.num_samples = 2000    #pyaudio內建緩衝大小
         self.sampling_rate = 8000  #取樣頻率
-        self.level = 10000          #聲音儲存的閾值
+        self.level = 15000          #聲音儲存的閾值
         self.count_num = 20        #count_num個取樣之內出現COUNT_NUM個大於LEVEL的取樣則記錄聲音
         self.save_length = 8       #聲音記錄的最小長度：save_length * num_samples 個取樣
         self.voice_string = []
@@ -44,21 +44,26 @@ class GenAudio(object):
             large_sample_count = np.sum(audio_data > self.level)
             if large_sample_count>0:
                 self.isListen=True
+                # for t in audio_data:
+                #     if t>self.level:
+                #         print(t," ",end='')
+                # print()
+                #print(sorted(audio_data,reverse=True))
                 save_buffer.append(string_audio_data)
             else: #取樣結束
                 if self.isListen:
                     self.isListen=False
                     if len(save_buffer)==1:
                         continue
-                    with speech_recognition.Microphone() as source: 
-                        print("Please talk:")
-                        r.adjust_for_ambient_noise(source) # 函數調整麥克風的噪音:
-                        audio = r.listen(source)
-                    try:
-                        Text = r.recognize_google(audio, language="zh-TW")
-                        print(Text)
-                    except:
-                        print("error")
+                    # with speech_recognition.Microphone() as source: 
+                    #     print("Please talk:")
+                    #     r.adjust_for_ambient_noise(source) # 函數調整麥克風的噪音:
+                    #     audio = r.listen(source)
+                    # try:
+                    #     Text = r.recognize_google(audio, language="zh-TW")
+                    #     print(Text)
+                    # except:
+                    #     print("error")
                     save_buffer.clear()
                 
         return True
