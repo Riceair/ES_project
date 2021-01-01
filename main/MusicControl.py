@@ -24,6 +24,9 @@ class MusicControl:
         self.isPlaying=True
         self.pg_mixer.music.play()
 
+    def is_finished_play(self):
+        return self.pg_mixer.music.get_busy()
+
     def music_pause(self): #暫停音樂
         if self.isPlaying==False: #若非播放音樂中，返回
             return
@@ -46,6 +49,8 @@ class MusicControl:
         self.isPause=False
         self.clear_music_list()
 
+    def get_isPause(self):
+        return self.isPause
 if __name__ == "__main__":
     mc=MusicControl()
     mc.set_music_list(["D:/..music_data/J-Pop/ClariS-ClariS - Single Best 1st-09-Click.mp3","D:/..music_data/Anime/Afterglow-Easy Come, Easy Go! - Single-01-Easy Come, Easy Go!.mp3"])

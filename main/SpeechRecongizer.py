@@ -8,7 +8,6 @@ class SpeechRecongizer:
 
     def start_recongize(self):
         with speech_recognition.Microphone() as source: 
-            print("Please talk:")
             self.r.adjust_for_ambient_noise(source) # 函數調整麥克風的噪音:
             audio = self.r.listen(source)
         try:
