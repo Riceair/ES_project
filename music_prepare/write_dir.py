@@ -30,5 +30,5 @@ if not folder:
 for i in range(len(allFolder)):
     f=open(name_path+"/"+allFolder[i]+".txt","w")
     for ms_n in allfList[i]:
-        f.write(ms_n+"\n")
+        f.write(ms_n[:-4]+"\n")
     f.close()
