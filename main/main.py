@@ -1,4 +1,4 @@
-from MusicControl import MusicControl
+from MusicControler import MusicControler
 from SpeechRecongizer import SpeechRecongizer
 from IntentRecongizer import IntentRecongizer
 import pyaudio
@@ -20,7 +20,7 @@ stream = pa.open(format=paInt16, channels=1, rate=sampling_rate, input=True,
         frames_per_buffer=num_samples) 
 
 #物件
-mc=MusicControl()
+mc=MusicControler()
 sr=SpeechRecongizer()
 ir=IntentRecongizer()
 
