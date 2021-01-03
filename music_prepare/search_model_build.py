@@ -24,8 +24,16 @@ dictionary=corpora.Dictionary(music_tokens)
 corpus=[dictionary.doc2bow(w) for w in music_tokens]  #計算每一個字出現頻率 並轉為bow(稀疏向量形式)
 tfidf=models.TfidfModel(corpus) #把bow輸入進入tfidf
 corpus_tfidf = tfidf[corpus]
-lsi = models.LsiModel(corpus_tfidf, id2word=dictionary, num_topics=100)
-index=similarities.MatrixSimilarity(lsi[corpus])
+lsi = models.LsiModel(corpus_tfidf, id2word=dictionary, num_topics=100) #建立Lsi model
+index=similarities.MatrixSimilarity(lsi[corpus]) #紀錄相似度index
+
+#儲存model dict index
 dictionary.save("search_model/Lsi_dict.dict")
 lsi.save("search_model/Lsi_model.lsi")
 index.save("search_model/Lsi_index.index")
+
+#產生jieba字詞表
+f=open("search_model/jieba_dict.txt",mode="w")
+for i in range(len(dictionary)):
+    f.write(dictionary[i]+"\n")
+f.close()
