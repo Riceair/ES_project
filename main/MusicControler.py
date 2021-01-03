@@ -24,7 +24,7 @@ class MusicControler:
         self.isPlaying=True
         self.pg_mixer.music.play()
 
-    def is_finished_play(self):
+    def is_busy(self):
         return self.pg_mixer.music.get_busy()
 
     def music_pause(self): #暫停音樂

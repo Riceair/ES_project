@@ -1,6 +1,7 @@
 from MusicControler import MusicControler
 from SpeechRecongizer import SpeechRecongizer
 from IntentRecongizer import IntentRecongizer
+from MusicSearcher import MusicSearcher
 import pyaudio
 import os
 import numpy as np 
@@ -21,10 +22,12 @@ stream = pa.open(format=paInt16, channels=1, rate=sampling_rate, input=True,
 
 #物件
 mc=MusicControler()
+ms=MusicSearcher()
 sr=SpeechRecongizer()
 ir=IntentRecongizer()
 
-while True:            
+while True:
+    if isPlaying and mc.is_busy()==False: mc.music_next() #檢測是否結束播放一首歌
     # 讀入num_samples個取樣
     string_audio_data = stream.read(num_samples)
 
@@ -43,7 +46,9 @@ while True:
             #開始辨識是否被呼叫
             print("Did you call me?")
             Text=sr.start_recongize()
-            if Text==-1: continue
+            if Text==-1:
+                print("I'm not sure")
+                continue
             else:
                 if ass_wake in Text:
                     #辨識意圖
@@ -57,9 +62,7 @@ while True:
                         intent,play_name = ir.check_intent(Text)
                         if intent=="": continue
                         if not isPlaying and intent=="play":
-                            #To do... get play list
-                            #play music
-                            mc.set_music_list(["D:/..music_data/J-Pop/ClariS-ClariS - Single Best 1st-09-Click.mp3","D:/..music_data/Anime/Afterglow-Easy Come, Easy Go! - Single-01-Easy Come, Easy Go!.mp3"])
+                            mc.set_music_list(ms.get_play_list(play_name))
                             mc.music_play()
                             isPlaying=True
                         elif isPlaying:
