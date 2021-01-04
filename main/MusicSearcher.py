@@ -21,11 +21,16 @@ class MusicSearcher():
         self.__set_music_path()
 
     def __search_index(self,query):
-        query=query.lower().split(" ")
+        query=query.lower()
         word=[]
         for w in self.id_dict.keys(): #檢查query有哪些詞在資料庫
-            for q in query:
-                if w in q: word.append(w)
+            if w in query:
+                addFlag=True #標記是否加入query的token
+                for cw in word: #檢查是否已經有較完整詞語加入，若有，當前詞不加入 (cw => candidate word)
+                    if w in cw:
+                        addFlag=False
+                        break
+                if addFlag: word.append(w)
         word_id=[] #轉成id
         for w in word:
             word_id.append(self.id_dict[w])
@@ -76,5 +81,5 @@ class MusicSearcher():
 
 if __name__ == "__main__":
     ms=MusicSearcher()
-    play_list=ms.get_play_list("afterglow hey")
+    play_list=ms.get_play_list("一口氣全唸對")
     print(play_list[:3])
