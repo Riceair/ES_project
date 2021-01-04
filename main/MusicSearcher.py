@@ -1,32 +1,62 @@
-from gensim import corpora,similarities,models
+import numpy as np
+import ast
 import os
 
 class MusicSearcher():
     def __init__(self):
-        self.dictionary = corpora.Dictionary.load('search_model/tfidf_dict.dict')
-        self.tfidf = models.LsiModel.load('search_model/tfidf_model.model')
-        self.index = similarities.SparseMatrixSimilarity.load('search_model/tfidf_index.index')
-        self.dict_list=[]
+        #存取id轉換表
+        f=open("search_model\id_dict.txt","r")
+        contents=f.read()
+        self.id_dict=ast.literal_eval(contents)
+        f.close()
+        #存取idf
+        f=open("search_model\idf.txt","r")
+        contents=f.read()
+        self.idf=ast.literal_eval(contents)
+        f.close()
+        #存取資料庫向量
+        self.data_vector=np.load("search_model/data_vector.npy",allow_pickle=True)
+
         self.music_path=[]
         self.__set_music_path()
-        for i in range(len(self.dictionary)):
-            self.dict_list.append(self.dictionary[i])
 
     def __search_index(self,query):
         query=query.lower().split(" ")
         word=[]
-        for q in query: #先檢查英文字(英文字經過token可以直接在dict查詢)
-            if q in self.dict_list:
-                word.append(q)
-                query.pop(query.index(q)) #檢查過後將其pop(避免重複查詢)
-        for w in self.dict_list: #檢查中文(中文因為沒經過切詞，因此改檢查dict是否存在於query內)
+        for w in self.id_dict.keys(): #檢查query有哪些詞在資料庫
             for q in query:
                 if w in q: word.append(w)
-        query_bow = self.dictionary.doc2bow(word)
-        tfidf_vec = self.tfidf[query_bow]
-        sims = self.index[tfidf_vec]
+        word_id=[] #轉成id
+        for w in word:
+            word_id.append(self.id_dict[w])
+        #計算query的vector
+        word_v={} #紀錄向量
+        for wid in word_id:
+            word_v[wid]=word_v.get(wid,0)+1 #紀錄每個word出現次數
+        for wid in word_v.keys(): #計算向量權重
+            word_v[wid]=(word_v[wid]/len(self.data_vector))*self.idf[wid] #tf(weight) * idf
+        #計算相似度
+        sims=[] #紀錄相似度
+        for v in self.data_vector:
+            sims.append(self.__sim_compute(word_id,word_v,v))
         sorted_index = sorted(enumerate(sims), key=lambda item: -item[1])
         return sorted_index
+    
+    def __sim_compute(self,query_id,query_v,v): #計算cosine similarity
+        nmr=0 #分子
+        dmr=0 #分母
+        for qid in query_id:
+            if qid in v.keys():
+                nmr += query_v[qid]*v[qid]
+        q_dmr=0
+        for i in query_v.keys():
+            q_dmr += query_v[i]**2
+        v_dmr=0
+        for i in v.keys():
+            v_dmr += v[i]**2
+        dmr=q_dmr**(1/2)+v_dmr**(1/2)
+        if dmr==0: return 0 #分母若為0回傳0
+        return nmr/dmr
         
     def __set_music_path(self):
         folder_path = "music_prepare/path"
@@ -46,5 +76,5 @@ class MusicSearcher():
 
 if __name__ == "__main__":
     ms=MusicSearcher()
-    play_list=ms.get_play_list("afterglow easy come")
+    play_list=ms.get_play_list("afterglow hey")
     print(play_list[:3])

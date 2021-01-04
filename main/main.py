@@ -9,7 +9,7 @@ from pyaudio import PyAudio, paInt16
 
 num_samples = 2000    #pyaudio內建緩衝大小
 sampling_rate = 8000  #取樣頻率
-level = 10000          #聲音儲存的閾值
+level = 15000          #聲音儲存的閾值
 ass_wake="狗"
 isPlaying=False
 save_count = 0
