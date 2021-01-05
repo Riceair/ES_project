@@ -4,7 +4,8 @@ from IntentRecongizer import IntentRecongizer
 from MusicSearcher import MusicSearcher
 import pyaudio
 import os
-import numpy as np 
+import numpy as np
+import wave
 from pyaudio import PyAudio, paInt16
 
 num_samples = 2000    #pyaudio內建緩衝大小
@@ -14,7 +15,16 @@ ass_wake="狗"
 isPlaying=False
 save_count = 0
 save_buffer = []
+calling_wav_name="main/isCalling.wav"
 isListen=False
+
+def save_wav(sampling_rate, voice_string,filename):
+        wf = wave.open(filename, "wb") 
+        wf.setnchannels(1) 
+        wf.setsampwidth(2) 
+        wf.setframerate(sampling_rate) 
+        wf.writeframes(np.array(voice_string).tostring())
+        wf.close()
 
 pa = PyAudio() 
 stream = pa.open(format=paInt16, channels=1, rate=sampling_rate, input=True, 
@@ -44,8 +54,8 @@ while True:
             if len(save_buffer)==1:
                 continue
             #開始辨識是否被呼叫
-            print("Did you call me?")
-            Text=sr.start_recongize()
+            save_wav(sampling_rate,save_buffer,calling_wav_name)
+            Text=sr.isCalling_recongize(calling_wav_name)
             if Text==-1:
                 print("I'm not sure")
                 continue

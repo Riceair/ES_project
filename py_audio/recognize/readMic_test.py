@@ -1,7 +1,8 @@
 import os
 import sys
 import wave
-import numpy as np 
+import numpy as np
+from SpeechRecongizer import SpeechRecongizer
 from pyaudio import PyAudio, paInt16
 class GenAudio(object):
     def __init__(self):
@@ -29,7 +30,9 @@ class GenAudio(object):
                 frames_per_buffer=self.num_samples) 
         
         save_count = 0
-        save_buffer = [] 
+        save_buffer = []
+        isListen=False
+        sr=SpeechRecongizer()
         while True:            
             # 讀入num_samples個取樣
             string_audio_data = stream.read(self.num_samples)     
@@ -37,10 +40,22 @@ class GenAudio(object):
             audio_data = np.fromstring(string_audio_data, dtype = np.short)
             #計算大於 level 的取樣的個數
             large_sample_count = np.sum(audio_data > self.level)
+            
             if large_sample_count>0:
-                print(audio_data)
+                isListen=True
+                save_buffer.append(string_audio_data)
+            else: #取樣結束
+                if isListen:
+                    isListen=False
+                    if len(save_buffer)==1:
+                        continue
+                    #開始辨識是否被呼叫
+                    self.voice_string=save_buffer
+                    self.save_wav('test.wav')
+                    #Text=sr.start_recongize()
+                    print(sr.isCalling_recongize('test.wav'))
+                save_buffer.clear()
         return True
 if __name__ == "__main__":
     r = GenAudio()
     r.read_audio()
-    r.save_wav("./test.wav")

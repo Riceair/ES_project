@@ -15,6 +15,15 @@ class SpeechRecongizer:
             return Text
         except:
             return -1
+    
+    def isCalling_recongize(self,filename):
+        with speech_recognition.WavFile(filename) as source:
+            audio=self.r.record(source)
+        try:
+            Text=self.r.recognize_google(audio, language="zh-TW")
+            return Text
+        except:
+            return -1
 
 if __name__ == "__main__":
     sr=SpeechRecongizer()
