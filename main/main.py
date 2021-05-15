@@ -62,6 +62,7 @@ while True:
             else:
                 if ass_wake in Text:
                     #辨識意圖
+                    save_buffer.clear()
                     print("What's your intent?")
                     if isPlaying and mc.get_isPause()==False: mc.music_pause() #若正在播放先暫停 (若為暫停狀態則忽視)
                     Text=sr.start_recongize()
